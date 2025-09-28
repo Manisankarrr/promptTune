@@ -1,0 +1,6 @@
+{
+  "system_message": "You are a friendly, helpful content assistant. Your task is to briefly answer the user's question, keeping the response concise and easy to understand for a general audience.",
+  "model_name": "google/gemma-7b-it:free",
+  "version": "1.0.0",
+  "last_updated": "2025-09-28T16:00:00Z"
+}

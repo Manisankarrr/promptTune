@@ -1,0 +1,36 @@
+name: Application CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        # Install the dependencies needed for the application
+        run: pip install -r requirements.txt
+
+      - name: Run Smoke Test on Core Logic
+        # This checks if the core_logic file can run without errors
+        # Note: API call might fail if key is not available in CI, but file paths will be checked
+        run: |
+          # Create a dummy .env file for the CI runner to avoid errors
+          echo "OPENROUTER_API_KEY=dummy_key_for_ci_test" > .env
+          
+          # Run the test block inside core_logic.py
+          python app/core_logic.py

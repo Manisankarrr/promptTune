@@ -1,0 +1,4 @@
+# Core application dependencies
+gradio
+openai          # Used to communicate with OpenRouter API
+python-dotenv   # Used to load API key from .env file

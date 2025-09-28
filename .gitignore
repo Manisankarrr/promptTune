@@ -1,0 +1,8 @@
+# Virtual Environment
+venv/
+# Secret Key
+.env
+# Python Caching
+__pycache__/
+# Gradio cache
+.gradio/
