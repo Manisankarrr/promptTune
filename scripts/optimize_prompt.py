@@ -26,11 +26,27 @@ def load_data(path: Path):
     try:
         if path.exists():
             content = path.read_text().strip()
-            return json.loads(content) if content else []
+            # Handle empty file case by returning an empty list/dict as appropriate
+            if not content:
+                return []
+            
+            data = json.loads(content)
+            # Ensure master_prompt always returns a dictionary, feedback_log returns a list
+            if path == MASTER_PROMPT_PATH and not isinstance(data, dict):
+                 return {}
+            if path == FEEDBACK_LOG_PATH and not isinstance(data, list):
+                 return []
+            return data
+            
+        # Create initial empty state if file doesn't exist
+        if path == MASTER_PROMPT_PATH:
+             return {"system_message": "A critical error occurred.", "version": "1.0.0", "last_updated": datetime.datetime.now().isoformat()}
         return []
+    
     except Exception as e:
         print(f"Error loading {path}: {e}")
         return []
+
 
 def aggregate_negative_feedback(feedback_data: list) -> str:
     """
@@ -64,7 +80,7 @@ def optimize_system_prompt(current_system_message: str, feedback_summary: str) -
         "You are the **System Prompt Optimizing Agent**. Your goal is to analyze the 'FAILED FEEDBACK' and rewrite the 'CURRENT SYSTEM MESSAGE' "
         "to address the problems identified. The new system message must aim to improve the quality of future responses, making them more accurate, "
         "detailed, or strictly adherent to formatting rules, based on the failure patterns. "
-        "You must output **ONLY** the new system message text, nothing else."
+        "You must output **ONLY** the new system message text, nothing else. Do not use markdown quotes."
     )
 
     # The user message feeds the prompt and the negative data to the agent
@@ -108,6 +124,23 @@ def optimize_system_prompt(current_system_message: str, feedback_summary: str) -
         print(f"CRITICAL ERROR: Meta-LLM API call failed: {e}")
         return current_system_message # Return original prompt on failure
 
+def increment_version(version_str: str) -> str:
+    """Safely increments the minor version (Y in X.Y.Z) of a version string."""
+    try:
+        parts = version_str.split('.')
+        if len(parts) < 2:
+            return "1.0.0"  # Fallback
+            
+        # Increment the second part (the minor version)
+        new_minor_version = int(parts[1]) + 1
+        
+        # Keep the rest of the string structure (e.g., 1.0.0 -> 1.1.0)
+        return f"{parts[0]}.{new_minor_version}.{'.'.join(parts[2:])}"
+        
+    except Exception:
+        # If any part fails (e.g., if parts[1] isn't an integer), reset to a known state.
+        return "1.0.0" 
+
 
 def run_optimization():
     """Main function for the MLOps pipeline script."""
@@ -126,6 +159,7 @@ def run_optimization():
     feedback_summary = aggregate_negative_feedback(feedback_data)
     
     if feedback_summary is None:
+        # Optimization was skipped because not enough negative feedback was found
         return
 
     # 3. Optimize Prompt
@@ -137,7 +171,7 @@ def run_optimization():
         
         # 5. Update Master Prompt File
         current_config["system_message"] = new_system_message
-        current_config["version"] = str(round(float(current_config.get("version", 1.0)) + 0.01, 2))
+        current_config["version"] = increment_version(current_config.get("version", "1.0.0"))
         current_config["last_updated"] = datetime.datetime.now().isoformat()
         
         with open(MASTER_PROMPT_PATH, 'w') as f:
@@ -153,5 +187,5 @@ def run_optimization():
         print("\nINFO: No significant change or API error. Master prompt remains the same.")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run_optimization()
