@@ -14,7 +14,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # File Paths
 MASTER_PROMPT_PATH = PROJECT_ROOT / "data" / "master_prompt.json"
 FEEDBACK_LOG_PATH = PROJECT_ROOT / "data" / "feedback_log.json"
-
+STATUS_LOG_PATH = PROJECT_ROOT / "data" / "status_log.txt" 
 # LLM Model ID for Rewriting (Meta-LLM)
 META_LLM_MODEL = "x-ai/grok-4-fast" 
 # The minimum number of negative feedback entries required to trigger an update
@@ -26,19 +26,21 @@ def load_data(path: Path):
     try:
         if path.exists():
             content = path.read_text().strip()
-            # Handle empty file case by returning an empty list/dict as appropriate
+            
+            # Handle empty content
             if not content:
                 return []
             
             data = json.loads(content)
-            # Ensure master_prompt always returns a dictionary, feedback_log returns a list
+            
+            # Ensure correct type based on file (MASTER_PROMPT is dict, FEEDBACK_LOG is list)
             if path == MASTER_PROMPT_PATH and not isinstance(data, dict):
                  return {}
             if path == FEEDBACK_LOG_PATH and not isinstance(data, list):
                  return []
             return data
             
-        # Create initial empty state if file doesn't exist
+        # Create initial state if file doesn't exist
         if path == MASTER_PROMPT_PATH:
              return {"system_message": "A critical error occurred.", "version": "1.0.0", "last_updated": datetime.datetime.now().isoformat()}
         return []
@@ -127,18 +129,21 @@ def optimize_system_prompt(current_system_message: str, feedback_summary: str) -
 def increment_version(version_str: str) -> str:
     """Safely increments the minor version (Y in X.Y.Z) of a version string."""
     try:
+        # Assumes format X.Y.Z
         parts = version_str.split('.')
         if len(parts) < 2:
-            return "1.0.0"  # Fallback
+            return "1.0.0" 
             
         # Increment the second part (the minor version)
         new_minor_version = int(parts[1]) + 1
         
-        # Keep the rest of the string structure (e.g., 1.0.0 -> 1.1.0)
-        return f"{parts[0]}.{new_minor_version}.{'.'.join(parts[2:])}"
+        # Rebuild the version string
+        # Uses parts[2:] for safety, handles missing Z value if needed
+        new_parts = [parts[0], str(new_minor_version)] + parts[2:]
+        return ".".join(new_parts)
         
     except Exception:
-        # If any part fails (e.g., if parts[1] isn't an integer), reset to a known state.
+        # If any part fails (non-integer, etc.), reset to a safe, known state.
         return "1.0.0" 
 
 
@@ -153,6 +158,8 @@ def run_optimization():
     
     if not feedback_data:
         print("INFO: Feedback log is empty. Exiting optimization.")
+        # Update the status log to reflect that the scheduled job ran but was skipped.
+        update_status_log("MLOps Optimization skipped (No new feedback).")
         return
 
     # 2. Aggregate Feedback
@@ -160,6 +167,7 @@ def run_optimization():
     
     if feedback_summary is None:
         # Optimization was skipped because not enough negative feedback was found
+        update_status_log("MLOps Optimization skipped (Insufficient negative feedback).")
         return
 
     # 3. Optimize Prompt
@@ -182,9 +190,25 @@ def run_optimization():
         with open(FEEDBACK_LOG_PATH, 'w') as f:
             json.dump([], f)
         print("Feedback log cleared.")
-    
+        
+        # 7. Update the Status Log (Rewrites the file with new timestamp)
+        update_status_log(f"MLOps Prompt Optimization deployed successfully. New version: {current_config['version']}")
+        
     else:
         print("\nINFO: No significant change or API error. Master prompt remains the same.")
+        update_status_log("MLOps Optimization failed to deploy (API error or no meaningful change detected).")
+
+def update_status_log(status_message: str):
+    """Writes the current status to the status log file, overwriting the previous entry."""
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S IST")
+    log_content = f"[{current_time}] {status_message}"
+    
+    try:
+        with open(STATUS_LOG_PATH, 'w') as f:
+            f.write(log_content)
+        print(f"Status log updated: {log_content}")
+    except Exception as e:
+        print(f"CRITICAL ERROR: Failed to write to status log: {e}")
 
 
 if __name__ == '__main__':
