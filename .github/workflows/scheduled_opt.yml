@@ -1,7 +1,7 @@
 name: Scheduled Prompt Optimization
 
 on:
-  # Run every day at midnight UTC
+  # Run every day at midnight UTC (00:00 UTC)
   schedule:
     - cron: '0 0 * * *' 
   # Allows manual triggering from the GitHub Actions tab
@@ -11,17 +11,16 @@ jobs:
   optimize_and_commit:
     runs-on: ubuntu-latest
     
-    # --- CRITICAL FIX: Add explicit write permission to the job ---
+    # --- CRITICAL FIX: Grant explicit WRITE permission to the built-in GITHUB_TOKEN ---
     permissions:
-      contents: write # This grants the built-in GITHUB_TOKEN write access
-    # -------------------------------------------------------------
+      contents: write 
+    # ---------------------------------------------------------------------------------
       
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # This line checks out the code and utilizes the GITHUB_TOKEN 
-          # which now has 'write' permission from the job block above.
+          # Use the built-in GITHUB_TOKEN that now has 'write' authority
           token: ${{ secrets.GITHUB_TOKEN }} 
 
       - name: Set up Python
@@ -33,18 +32,15 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Prompt Optimization Script
-        # Your custom secret for the API is correctly passed here
+        # Executes the core Python logic
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: python scripts/optimize_prompt.py
 
       - name: Commit and Push changes
-        # This action will now successfully commit and push because the token 
-        # checked out in the first step had 'write' permission.
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: 'MLOps: Auto-updated master_prompt.json based on user feedback.'
-          file_pattern: |
-            data/master_prompt.json
-            data/feedback_log.json
-            data/status_log.txt
+          # --- FINAL FIX: Explicitly include the new status log file in the commit ---
+          file_pattern: 'data/master_prompt.json data/feedback_log.json data/status_log.txt'
+          # ---------------------------------------------------------------------------
