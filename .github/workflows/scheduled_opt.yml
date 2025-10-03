@@ -42,5 +42,5 @@ jobs:
         with:
           commit_message: 'MLOps: Auto-updated master_prompt.json based on user feedback.'
           # --- FINAL FIX: Explicitly include the new status log file in the commit ---
-          file_pattern: 'data/master_prompt.json data/feedback_log.json data/status_log.txt'1
+          file_pattern: 'data/master_prompt.json data/feedback_log.json data/status_log.txt'
           # ---------------------------------------------------------------------------
