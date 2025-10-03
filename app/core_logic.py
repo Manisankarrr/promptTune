@@ -35,7 +35,7 @@ META_LLM_MODEL = "x-ai/grok-4-fast"
 def load_master_prompt():
     """Loads the current system message from the master configuration file."""
     try:
-        # Using Path.read_text() is clean and safe
+        #  Using Path.read_text() is clean and safe
         return json.loads(MASTER_PROMPT_PATH.read_text())
     except FileNotFoundError:
         # Create the file with initial data if it doesn't exist
