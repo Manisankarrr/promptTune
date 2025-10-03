@@ -1,4 +1,22 @@
+---
+title: PromptTune
+emoji: 🐠
+colorFrom: indigo
+colorTo: green
+sdk: gradio
+sdk_version: 5.48.0
+app_file: app/gradio_interface.py # <--- FIXED LINE
+pinned: false
+license: mit
+short_description: MLOps for Prompt Engineering and Continuous Improvement.
+---
 
+# 🚀 Intelligent Prompt Optimizer (IPO-Meta)
+
+This project demonstrates a zero-GPU MLOps pipeline using LLM orchestration 
+to automatically improve the system prompt based on continuous user feedback.
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
 # 🎵 PromptTune
 
 **MLOps Toolkit for Interactive Prompt Engineering and Optimization**
@@ -12,12 +30,17 @@
 ---
 ## 🚀 Features
 
-- **🤖 LLM Orchestration & Rewriting:** Dynamically leverages a **Meta-LLM** via the OpenRouter API to transform vague user inputs into highly structured, actionable system prompts, ensuring high-quality responses from the final **Task-LLM**.
-- **♻️ Continuous Prompt Learning:** Implements a zero-GPU, feedback-driven loop where sufficient **negative user ratings (Rating: 0)** automatically trigger the optimization workflow.
-- **⚙️ MLOps Deployment Pipeline:** Uses scheduled **GitHub Actions** to execute the core Python script, automatically versioning, committing, and deploying the newly refined system prompt configuration back to the main branch.
-- **💾 Versioned Configuration Management:** Maintains a single source of truth for the active system prompt (`master_prompt.json`), ensuring **reproducibility** and enabling future rollbacks.
-- **💻 Gradio Interface & Data Collection:** Provides a simple, Python-native web interface for user interaction and securely logs all raw feedback to inform the next nightly deployment cycle.
-- **📊 Observability Log:** Includes a dedicated status file (`status_log.txt`) that tracks the exact date and time of the last successful prompt deployment, offering a clear audit trail.
+**🤖 LLM Orchestration & Rewriting:** Dynamically leverages a **Meta-LLM** via the OpenRouter API to transform vague user inputs into highly structured, actionable system prompts, ensuring high-quality responses from the final **Task-LLM**.
+
+**♻️ Continuous Prompt Learning:** Implements a zero-GPU, feedback-driven loop where sufficient **negative user ratings (Rating: 0)** automatically trigger the optimization workflow.
+
+**⚙️ MLOps Deployment Pipeline:** Uses scheduled **GitHub Actions** to execute the core Python script, automatically versioning, committing, and deploying the newly refined system prompt configuration back to the main branch.
+
+**💾 Versioned Configuration Management:** Maintains a single source of truth for the active system prompt (`master_prompt.json`), ensuring **reproducibility** and enabling future rollbacks.
+
+**💻 Gradio Interface & Data Collection:** Provides a simple, Python-native web interface for user interaction and securely logs all raw feedback to inform the next nightly deployment cycle.
+
+**📊 Observability Log:** Includes a dedicated status file (`status_log.txt`) that tracks the exact date and time of the last successful prompt deployment, offering a clear audit trail.
 
 ---
 
