@@ -1,7 +1,5 @@
-# promptTune
 
-```markdown
-# 🎵 promptTune
+# 🎵 PromptTune
 
 **MLOps Toolkit for Interactive Prompt Engineering and Optimization**
 
@@ -102,9 +100,4 @@ This project is licensed under the [MIT License](LICENSE).
 > **Maintained by [Manisankarrr](https://github.com/Manisankarrr)**
 ```
 
-
-## License
-This project is licensed under the **MIT** License.
-
----
 🔗 GitHub Repo: https://github.com/Manisankarrr/promptTune
