@@ -44,3 +44,9 @@ jobs:
           # --- FINAL FIX: Explicitly include the new status log file in the commit ---
           file_pattern: 'data/master_prompt.json data/feedback_log.json data/status_log.txt'
           # ---------------------------------------------------------------------------
+      - name: Push to Hugging Face Space
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add space https://Manisankarrr:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/Manisankarrr/PromptTune
+          git push space main --force
