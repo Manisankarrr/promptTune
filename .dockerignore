@@ -1,0 +1,14 @@
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Virtual environment files
+venv/
+.venv/
+.tox/
+
+# Local configuration and logs (crucial for security/size)
+.env
+.DS_Store
+*.log
+tmp/
