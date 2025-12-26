@@ -27,9 +27,9 @@ FEEDBACK_LOG_PATH = PROJECT_ROOT / "data" / "feedback_log.json"
 
 # --- CORRECTED LLM Model IDs ---
 # Swapping to a confirmed free model ID on OpenRouter
-TASK_LLM_MODEL = "x-ai/grok-4-fast" 
+TASK_LLM_MODEL = "z-ai/glm-4.5-air:free" 
 # Keeping the Meta-LLM for later use
-META_LLM_MODEL = "x-ai/grok-4-fast" 
+META_LLM_MODEL = "z-ai/glm-4.5-air:free" 
 
 
 def load_master_prompt():
